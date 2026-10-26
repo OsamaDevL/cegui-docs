@@ -10,7 +10,7 @@ copy buttons on code, and an on-page contents list.
 
 This is not an official CEGUI project site.
 
-**Page names match the official site,** so any official link works here by swapping the host. For example:
+**Page names match the official site,** so official page links work here by swapping the host. For example:
 `https://static.cegui.org.uk/docs/0.8.7/fal_intro.html` → `https://osamadevl.github.io/cegui-docs/fal_intro.html`.
 
 There is also a hand-made single page for the Falagard skinning tutorial and reference:
