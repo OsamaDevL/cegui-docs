@@ -1,0 +1,10 @@
+/* Small additions on top of doxygen-awesome-css */
+html {
+  --content-maxwidth: 1050px;
+}
+
+/* Long C++ signatures in member tables wrap instead of pushing the page sideways */
+table.memname td.memname,
+table.memberdecls td.memItemRight {
+  overflow-wrap: anywhere;
+}

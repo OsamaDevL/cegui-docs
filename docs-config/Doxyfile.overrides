@@ -1,0 +1,38 @@
+# Settings layered on top of CEGUI's own doc/doxygen/doxyfile.in (v0-8-7).
+# Later lines in a Doxyfile win, so build.sh appends this file to the original.
+
+PROJECT_BRIEF          = "Unofficial reformatted copy of the 0.8.7 docs"
+OUTPUT_DIRECTORY       = _build
+HTML_OUTPUT            = html
+
+# The original INPUT starts with "." (the CMake build dir); point it at the sources only.
+INPUT                  = cegui/doc/doxygen cegui/cegui/include
+# "cegui" is included so the license page can pull in CEGUI's COPYING file.
+EXAMPLE_PATH           = cegui cegui/doc cegui/cegui/src/ScriptModules/Lua/support/tolua++bin
+
+# Keep flat file names (fal_intro.html, classCEGUI_1_1Window.html) so links match the official site.
+CREATE_SUBDIRS         = NO
+
+# doxygen-awesome-css theme, sidebar-only variant with a dark mode toggle
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+HTML_COLORSTYLE        = LIGHT
+HTML_EXTRA_STYLESHEET  = theme/doxygen-awesome.css \
+                         theme/doxygen-awesome-sidebar-only.css \
+                         theme/doxygen-awesome-sidebar-only-darkmode-toggle.css \
+                         docs-config/custom.css
+HTML_EXTRA_FILES       = theme/doxygen-awesome-darkmode-toggle.js \
+                         theme/doxygen-awesome-fragment-copy-button.js \
+                         theme/doxygen-awesome-paragraph-link.js \
+                         theme/doxygen-awesome-interactive-toc.js
+HTML_DYNAMIC_SECTIONS  = NO
+
+# Class diagrams as SVG
+HAVE_DOT               = YES
+DOT_IMAGE_FORMAT       = svg
+DOT_TRANSPARENT        = YES
+DOT_NUM_THREADS        = 0
+
+QUIET                  = YES
+WARN_LOGFILE           = _build/warnings.log

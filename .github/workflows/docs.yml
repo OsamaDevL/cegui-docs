@@ -1,0 +1,64 @@
+name: Build and publish docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v4
+
+      - name: Check out CEGUI 0.8.7 sources
+        uses: actions/checkout@v4
+        with:
+          repository: cegui/cegui
+          ref: v0-8-7
+          path: cegui
+          sparse-checkout: |
+            doc
+            cegui/include
+            cegui/src/ScriptModules/Lua/support
+
+      - name: Check out the doxygen-awesome-css theme
+        uses: actions/checkout@v4
+        with:
+          repository: jothepro/doxygen-awesome-css
+          ref: v2.5.0
+          path: theme
+
+      - name: Install Doxygen and Graphviz
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+      - name: Build
+        run: |
+          doxygen --version
+          bash docs-config/build.sh
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _build/html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
