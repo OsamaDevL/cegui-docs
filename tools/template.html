@@ -1,0 +1,266 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Falagard Skinning Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky contents rail on the left, one 68ch reading column; rail folds into a "Contents" drawer on phones. */
+:root {
+  --bg: #fafbfb;
+  --surface: #f0f3f4;
+  --fg: #1c2327;
+  --muted: #5a666e;
+  --line: #dce2e5;
+  --accent: #1b6a86;
+  --accent-soft: #e2eff4;
+  --code-bg: #f3f5f6;
+  --tk-tag: #1b6a86;
+  --tk-attr: #8a4b08;
+  --tk-str: #2f7340;
+  --tk-com: #7b858c;
+  --tk-kw: #7a3d9a;
+  --tk-num: #a33f2f;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.5rem;
+  --step-3: 2.125rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171a; --surface: #182024; --fg: #dde4e8; --muted: #93a1aa; --line: #26323a;
+    --accent: #6cc0dc; --accent-soft: #17313b; --code-bg: #182024;
+    --tk-tag: #6cc0dc; --tk-attr: #e3b072; --tk-str: #8fd19e; --tk-com: #7f8d96; --tk-kw: #c9a0e6; --tk-num: #f08f7c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171a; --surface: #182024; --fg: #dde4e8; --muted: #93a1aa; --line: #26323a;
+  --accent: #6cc0dc; --accent-soft: #17313b; --code-bg: #182024;
+  --tk-tag: #6cc0dc; --tk-attr: #e3b072; --tk-str: #8fd19e; --tk-com: #7f8d96; --tk-kw: #c9a0e6; --tk-num: #f08f7c;
+  color-scheme: dark;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 1.25rem; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: var(--step-0); line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+.shell {
+  display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 3.5rem;
+  max-width: 76rem; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 2.5rem 4rem;
+}
+
+/* ---------- contents rail ---------- */
+.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.25rem); align-self: start; max-height: calc(100vh - 2.5rem); overflow-y: auto; padding-right: 0.5rem; }
+.brand { display: grid; gap: 0.15rem; margin-bottom: 1.5rem; }
+.brand b { font-family: var(--font-display); font-size: var(--step-1); line-height: 1.2; font-weight: 700; }
+.brand span { font-size: var(--step--1); color: var(--muted); }
+.drawer-toggle { display: none; }
+.toc { list-style: none; margin: 0; padding: 0; font-size: var(--step--1); line-height: 1.4; display: grid; gap: 0.1rem; }
+.toc a { display: block; color: var(--muted); text-decoration: none; padding: 0.3rem 0.6rem; border-radius: 6px; border-left: 2px solid transparent; }
+.toc a:hover { color: var(--fg); background: var(--surface); }
+.toc a.on { color: var(--accent); background: var(--accent-soft); }
+.toc ul { list-style: none; margin: 0.1rem 0 0.4rem; padding: 0 0 0 0.6rem; display: grid; gap: 0.05rem; border-left: 1px solid var(--line); margin-left: 0.6rem; }
+.toc .group { margin: 1.25rem 0 0.35rem 0.6rem; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.toc .group:first-child { margin-top: 0; }
+.toc .part-link { color: var(--fg); font-weight: 500; }
+.toc .part-link small { display: block; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.toc .part-link.on small { color: var(--accent); }
+.toc .n3 a { padding-left: 1.4rem; }
+.js .toc .toc-part:not(.open) > ul { display: none; }
+
+/* ---------- article ---------- */
+main { min-width: 0; max-width: 46rem; }
+.notice {
+  font-size: var(--step--1); color: var(--muted); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem 1rem; margin: 0 0 2.5rem;
+}
+.part + .part { margin-top: 5rem; padding-top: 3rem; border-top: 1px solid var(--line); }
+.part-head { margin-bottom: 2rem; }
+.eyebrow { margin: 0 0 0.35rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+h1, h2, h3, h4, h5 { font-family: var(--font-display); line-height: 1.25; text-wrap: balance; position: relative; scroll-margin-top: 1.25rem; }
+h1 { font-size: var(--step-3); margin: 0 0 0.5rem; letter-spacing: -0.01em; }
+h2 { font-size: var(--step-2); margin: 3rem 0 0.75rem; }
+h3 { font-size: var(--step-1); margin: 2.25rem 0 0.5rem; }
+h4 { font-family: var(--font-body); font-size: var(--step-0); font-weight: 600; margin: 1.75rem 0 0.4rem; }
+h5 { font-family: var(--font-body); font-size: var(--step--1); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 1.5rem 0 0.25rem; }
+.anchor { position: absolute; left: -1.1em; color: var(--line); text-decoration: none; font-weight: 400; opacity: 0; }
+h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, h5:hover .anchor, .anchor:focus-visible { opacity: 1; color: var(--muted); }
+.src { margin: 0; font-size: var(--step--1); color: var(--muted); }
+p { margin: 0 0 1rem; }
+ul { margin: 0 0 1.25rem; padding-left: 1.25rem; display: grid; gap: 0.35rem; }
+li::marker { color: var(--muted); }
+:not(pre) > code {
+  font-family: var(--font-mono); font-size: 0.88em; background: var(--code-bg);
+  border: 1px solid var(--line); border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap;
+}
+
+/* ---------- code blocks ---------- */
+figure.code { margin: 0.5rem 0 1.5rem; border: 1px solid var(--line); border-radius: 8px; background: var(--code-bg); overflow: hidden; }
+figure.code figcaption {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  padding: 0.35rem 0.5rem 0.35rem 0.9rem; border-bottom: 1px solid var(--line);
+}
+.copy {
+  font: inherit; letter-spacing: 0.06em; color: var(--muted); background: transparent;
+  border: 1px solid var(--line); border-radius: 5px; padding: 0.2rem 0.55rem; cursor: pointer;
+}
+.copy:hover { color: var(--fg); border-color: var(--muted); }
+pre { margin: 0; padding: 0.9rem 1rem; overflow-x: auto; font-family: var(--font-mono); font-size: 0.86rem; line-height: 1.6; tab-size: 4; }
+pre code { font-family: inherit; }
+.t { color: var(--tk-tag); font-weight: 500; }
+.a { color: var(--tk-attr); }
+.s { color: var(--tk-str); }
+.c { color: var(--tk-com); font-style: italic; }
+.k { color: var(--tk-kw); }
+.n { color: var(--tk-num); }
+.p, .pn { color: var(--tk-com); }
+.formula { margin: 0.25rem 0 1.25rem; padding: 0.8rem 1rem; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 6px 6px 0; overflow-x: auto; }
+.formula code { background: none !important; border: 0 !important; padding: 0 !important; font-size: 0.95rem !important; white-space: pre !important; }
+
+/* ---------- footer ---------- */
+footer { margin-top: 5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: var(--step--1); color: var(--muted); }
+footer p { margin-bottom: 0.75rem; }
+footer details { margin-top: 1rem; }
+footer summary { cursor: pointer; color: var(--fg); font-weight: 500; }
+footer pre { margin-top: 0.75rem; max-height: 28rem; overflow: auto; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; font-size: 0.78rem; white-space: pre-wrap; }
+
+/* ---------- phones / narrow ---------- */
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; padding-block: 1.25rem 3rem; }
+  .rail { position: static; max-height: none; overflow: visible; padding: 0; }
+  .brand { margin-bottom: 0.75rem; }
+  .drawer { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  .drawer-toggle {
+    display: flex; justify-content: space-between; align-items: center; width: 100%;
+    font: inherit; font-size: var(--step--1); font-weight: 600; color: var(--fg);
+    background: none; border: 0; padding: 0.65rem 0.9rem; cursor: pointer; text-align: left;
+  }
+  .drawer-toggle::after { content: "+"; color: var(--muted); font-weight: 400; }
+  .rail.is-open .drawer-toggle::after { content: "\2212"; }
+  .rail:not(.is-open) #toc-nav { display: none; }
+  .rail.is-open #toc-nav { border-top: 1px solid var(--line); }
+  .rail .toc { padding: 0.5rem; max-height: 60vh; overflow-y: auto; }
+  .anchor { display: none; }
+  h1 { font-size: 1.75rem; }
+}
+</style>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand"><b>Falagard Skinning System</b><span>CEGUI 0.8.7 · tutorial and reference</span></div>
+    <div class="drawer">
+      <button type="button" class="drawer-toggle" id="toc-toggle" aria-expanded="false" aria-controls="toc-nav">Contents</button>
+      <nav aria-label="Contents" id="toc-nav">
+        <ul class="toc">
+{{NAV}}
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <main>
+    <p class="notice"><strong>Unofficial copy.</strong> A reformatted copy of the Falagard skinning pages from the
+      <a href="https://static.cegui.org.uk/docs/0.8.7/">CEGUI 0.8.7 documentation</a>: the two tutorial pages and the four
+      reference pages, built from the
+      <a href="https://github.com/cegui/cegui/tree/v0-8-7/doc/doxygen/falagard">original Doxygen sources</a>.
+      Only the layout changed; the text is the original.</p>
+
+{{CONTENT}}
+
+    <footer>
+      <p>Copyright (c) 2006 - 2011 Paul D Turner &amp; The CEGUI Development Team.</p>
+      <p>Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free
+        Documentation License, Version 1.2 or any later version published by the Free Software Foundation; with no
+        Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.</p>
+      <p>Modified version: converted from the Doxygen sources of CEGUI 0.8.7 (tag <code>v0-8-7</code>) to this page.
+        Only formatting was changed.</p>
+      <details>
+        <summary>GNU Free Documentation License 1.2 (full text)</summary>
+        <pre>{{FDL}}</pre>
+      </details>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  document.documentElement.classList.add('js');
+  // Copy buttons
+  document.querySelectorAll('figure.code .copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var code = btn.closest('figure').querySelector('pre code');
+      var done = function (msg) { btn.textContent = msg; setTimeout(function () { btn.textContent = 'Copy'; }, 1400); };
+      var fallback = function () {
+        var r = document.createRange(); r.selectNodeContents(code);
+        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        done('Selected');
+      };
+      try {
+        navigator.clipboard.writeText(code.innerText).then(function () { done('Copied'); }, fallback);
+      } catch (e) { fallback(); }
+    });
+  });
+
+  // Phones: start the contents drawer closed, close it after picking a section
+  // On wide screens CSS always shows the contents; the toggle only matters on phones.
+  var rail = document.querySelector('.rail');
+  var drawer = document.getElementById('toc-nav');
+  var toggle = document.getElementById('toc-toggle');
+  var narrow = window.matchMedia('(max-width: 900px)');
+  var setOpen = function (on) { rail.classList.toggle('is-open', on); toggle.setAttribute('aria-expanded', on ? 'true' : 'false'); };
+  toggle.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+  drawer.querySelectorAll('a').forEach(function (a) {
+    a.addEventListener('click', function () { if (narrow.matches) setOpen(false); });
+  });
+
+  // Highlight the section being read
+  var links = {};
+  drawer.querySelectorAll('a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+  var targets = Object.keys(links).map(function (id) { return document.getElementById(id); }).filter(Boolean);
+  var setPart = function (a) {
+    var part = a.closest('.toc-part');
+    drawer.querySelectorAll('.toc-part.open').forEach(function (p) { if (p !== part) p.classList.remove('open'); });
+    if (part) part.classList.add('open');
+  };
+  drawer.querySelectorAll('.part-link').forEach(function (a) {
+    a.addEventListener('click', function () { setPart(a); });
+  });
+  if (!('IntersectionObserver' in window)) {
+    document.documentElement.classList.remove('js');
+    return;
+  }
+  var current = null;
+  var io = new IntersectionObserver(function () {
+    var best = null;
+    targets.forEach(function (t) { if (t.getBoundingClientRect().top < window.innerHeight * 0.3) best = t; });
+    if (!best) best = targets[0];
+    if (best === current) return;
+    if (current) links[current.id].classList.remove('on');
+    current = best; links[best.id].classList.add('on');
+    setPart(links[best.id]);
+    if (!narrow.matches) {
+      var a = links[best.id], rail = document.querySelector('.rail');
+      var r = a.getBoundingClientRect(), rr = rail.getBoundingClientRect();
+      if (r.top < rr.top || r.bottom > rr.bottom) rail.scrollTop += r.top - rr.top - rr.height / 3;
+    }
+  }, { rootMargin: '0px 0px -70% 0px', threshold: [0, 1] });
+  targets.forEach(function (t) { io.observe(t); });
+})();
+</script>
